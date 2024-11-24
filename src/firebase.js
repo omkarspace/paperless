@@ -1,16 +1,14 @@
-
-
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBkkFF0XhNZeWuDmOfEhsgNxyozZW_t94A",
+  authDomain: "notekeeper-demo.firebaseapp.com",
+  projectId: "notekeeper-demo",
+  storageBucket: "notekeeper-demo.appspot.com",
+  messagingSenderId: "581326886241",
+  appId: "1:581326886241:web:c441975dc0f7d90f35c3e2"
+};
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 export const db = getFirestore(app);

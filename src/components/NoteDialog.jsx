@@ -1,17 +1,27 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import TextareaAutosize from 'react-textarea-autosize';
+import RichTextEditor from './RichTextEditor';
+import CategorySelect from './CategorySelect';
 
 export default function NoteDialog({ isOpen, onClose, note, onSave }) {
+  const [formData, setFormData] = useState({
+    title: note?.title || '',
+    tagline: note?.tagline || '',
+    body: note?.body || '',
+    category: note?.category || 'personal'
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    onSave({
-      title: formData.get('title'),
-      tagline: formData.get('tagline'),
-      body: formData.get('body'),
-    });
+    onSave(formData);
+  };
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
@@ -40,7 +50,7 @@ export default function NoteDialog({ isOpen, onClose, note, onSave }) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
                 <div className="flex justify-between items-center mb-4">
                   <Dialog.Title className="text-xl font-semibold text-gray-900">
                     {note ? 'Edit Note' : 'New Note'}
@@ -54,18 +64,34 @@ export default function NoteDialog({ isOpen, onClose, note, onSave }) {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      defaultValue={note?.title}
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                      placeholder="Enter title..."
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => handleChange('title', e.target.value)}
+                        required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        placeholder="Enter title..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Category
+                      </label>
+                      <CategorySelect
+                        selected={
+                          { 
+                            id: formData.category,
+                            name: formData.category.charAt(0).toUpperCase() + formData.category.slice(1)
+                          }
+                        }
+                        onChange={(category) => handleChange('category', category.id)}
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -74,23 +100,20 @@ export default function NoteDialog({ isOpen, onClose, note, onSave }) {
                     </label>
                     <input
                       type="text"
-                      name="tagline"
-                      defaultValue={note?.tagline}
+                      value={formData.tagline}
+                      onChange={(e) => handleChange('tagline', e.target.value)}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="Add a brief description..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Content
                     </label>
-                    <TextareaAutosize
-                      name="body"
-                      minRows={4}
-                      defaultValue={note?.body}
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    <RichTextEditor
+                      content={formData.body}
+                      onChange={(html) => handleChange('body', html)}
                       placeholder="Write your note here..."
                     />
                   </div>
